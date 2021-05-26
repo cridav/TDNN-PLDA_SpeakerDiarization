@@ -1,2 +1,3 @@
 downloadable/audio-20210524T233708Z-001.zip
 downloadable/data/embeddingsVoxCeleb1/\[embeddings\,\ \(dataList\,\ filenameList\,\ audioList\)\,\ \(labels\,\ prediction\,\ prediction_score\)\]_TRAIN_LOA.pkl
+downloadable/data/embeddingsPhoneCalls/[embeddings, (dataList, filenameList, audioList), (labels, prediction, prediction_score)]_TEST_LOAD.pkl
