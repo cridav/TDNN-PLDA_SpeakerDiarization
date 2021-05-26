@@ -47,6 +47,7 @@ class visualTool():
             [1., 0., 1.]]))
     )
     """
+    import numpy as np
     dictPredicts = dict()
     uniqueLabels = np.unique(labels)
     binaryLabel = np.zeros(shape = (len(uniqueLabels), len(labels)))
