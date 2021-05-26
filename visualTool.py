@@ -1,7 +1,18 @@
 # Quick class to visualize some results
 # by: @cridav
 
+import plotly.figure_factory as ff
+from sklearn import metrics
+import matplotlib.pyplot as plt
+import plotly.express as px
+import plotly
+import plotly.graph_objs as go
+import plotly.graph_objs as go
+import pandas as pd
+
 class visualTool():
+  def __init__(self):
+        pass
   def logHTML(self, Id, value):
     """
     Transforms a plotly image to HTML format and then uploads
