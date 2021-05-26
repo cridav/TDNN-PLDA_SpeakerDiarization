@@ -11,6 +11,7 @@ import plotly.graph_objs as go
 import pandas as pd
 import numpy as np
 import wandb
+from easydict import EasyDict as edict
 
 class visualTool():
   def __init__(self):
