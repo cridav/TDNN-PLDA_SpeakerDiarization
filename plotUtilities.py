@@ -1,3 +1,33 @@
+import numpy as np
+from tqdm.notebook import tqdm
+import matplotlib.pyplot as plt
+import wandb
+import os
+import pickle
+import torch
+import io
+import warnings
+from IPython.display import Audio
+import librosa
+from sklearn.metrics.pairwise import cosine_similarity
+import numpy as np
+import numpy.linalg as la
+import numpy.random as rn
+from scipy.stats import multivariate_normal as Gauss
+import matplotlib.pyplot as plt
+from time import time
+from easydict import EasyDict as edict
+from sklearn.cluster import SpectralClustering, AgglomerativeClustering, KMeans
+from scipy.ndimage import gaussian_filter
+
+from pyannote.core import Annotation, Segment
+from pyannote.metrics.diarization import DiarizationErrorRate, JaccardErrorRate, DiarizationPurity, DiarizationCoverage
+from pyannote.metrics.detection import DetectionAccuracy
+from pyannote.core import notebook
+
+import pandas as pd
+from IPython.display import display
+
 def matrixGrayScale(M, scale=255):
   """
   Maps a matrix between the range [0, 1]*scale"""
