@@ -230,6 +230,11 @@ def refineSimilarityMatrix(plda, similarityMatrix):
   affMatA_diffusion = np.dot(affMatA_symmetrization, affMatA_symmetrization.T)
   return matrixGrayScale(affMatA_diffusion, scale =1)
 
+def normalize(plda, X, function = lambda x : 1/(1+np.exp(-5*x))):
+  """normalize the similarity matrix with 'function'
+  default function: 1/(1+np.exp(-5*x))"""
+  return function(X)
+
 def ddt(Xk_list):
   # N - Dimension of the embedding; L - Number of examples; K - Number of classes
   rndLabels = []; rndTrSet = []
