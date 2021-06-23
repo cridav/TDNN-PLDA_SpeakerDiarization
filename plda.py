@@ -63,62 +63,62 @@ def getRvalue(plda,u,uu):
 #   return np.array(xRxx)
 
 # Computes only half of the matrix (this is symmetric): CDMJ
-def getRmatrix(plda, Xp, Xq):
-  assert Xp.shape == Xq.shape, "Matrices must have the same dimensions"
-  rMatrix = np.zeros((len(Xp), len(Xp)))
-  for diag in tqdm(range(0,len(Xp))):
-    for row in range(0, len(Xq)-diag):
-      col = row + diag
-      rMatrix[col,row] = rMatrix[row,col] = plda.getRvalue(Xp[row,:], Xq[col,:])
-  return rMatrix
+# def getRmatrix(plda, Xp, Xq):
+#   assert Xp.shape == Xq.shape, "Matrices must have the same dimensions"
+#   rMatrix = np.zeros((len(Xp), len(Xp)))
+#   for diag in tqdm(range(0,len(Xp))):
+#     for row in range(0, len(Xq)-diag):
+#       col = row + diag
+#       rMatrix[col,row] = rMatrix[row,col] = plda.getRvalue(Xp[row,:], Xq[col,:])
+#   return rMatrix
 
 
 # ****************** Fast R - matrix https://kaldi-asr.org/doc/kaldi-math_8h_source.html
-# def getRmatrix(plda, X, Xb):
-#         """
-#         Computes plda affinity matrix using Loglikelihood function
-#         Parameters
-#         ----------
-#         X : TYPE
-#             X-vectors 1 X N X D
-#         Returns
-#         -------
-#         Affinity matrix TYPE
-#             1 X N X N 
-#         """
-#         M_LOG_2PI = 1.8378770664093454835606594728112
-#         psi = plda.psi
-#         mean = psi/(psi+1.0)
-#         mean = mean.reshape(1,-1)*X # N X D , X[0]- Train xvectors
+def getRmatrix(plda, X, Xb):
+        """
+        Computes plda affinity matrix using Loglikelihood function
+        Parameters
+        ----------
+        X : TYPE
+            X-vectors 1 X N X D
+        Returns
+        -------
+        Affinity matrix TYPE
+            1 X N X N 
+        """
+        M_LOG_2PI = 1.8378770664093454835606594728112
+        psi = plda.psi
+        mean = psi/(psi+1.0)
+        mean = mean.reshape(1,-1)*X # N X D , X[0]- Train xvectors
         
-#         # given class computation
-#         variance_given = 1.0 + psi/(psi+1.0)
-#         logdet_given = np.sum(np.log(variance_given))
-#         variance_given = 1.0/variance_given
+        # given class computation
+        variance_given = 1.0 + psi/(psi+1.0)
+        logdet_given = np.sum(np.log(variance_given))
+        variance_given = 1.0/variance_given
         
-#         # without class computation
-#         variance_without =1.0 + psi
-#         logdet_without = np.sum(np.log(variance_without))
-#         variance_without = 1.0/variance_without
+        # without class computation
+        variance_without =1.0 + psi
+        logdet_without = np.sum(np.log(variance_without))
+        variance_without = 1.0/variance_without
         
-#         sqdiff = X #---- Test x-vectors
-#         nframe = X.shape[0]
-#         dim = X.shape[1]
-#         loglike_given_class = np.zeros((nframe,nframe))
-#         for i in range(nframe):
-#             sqdiff_given = sqdiff - mean[i]
-#             sqdiff_given  =  sqdiff_given**2
+        sqdiff = X #---- Test x-vectors
+        nframe = X.shape[0]
+        dim = X.shape[1]
+        loglike_given_class = np.zeros((nframe,nframe))
+        for i in range(nframe):
+            sqdiff_given = sqdiff - mean[i]
+            sqdiff_given  =  sqdiff_given**2
             
-#             loglike_given_class[:,i] = -0.5 * (logdet_given + M_LOG_2PI * dim + \
-#                                    np.matmul(sqdiff_given, variance_given))
-#         sqdiff_without = sqdiff**2
-#         loglike_without_class = -0.5 * (logdet_without + M_LOG_2PI * dim + \
-#                                      np.matmul(sqdiff_without, variance_without))
-#         loglike_without_class = loglike_without_class.reshape(-1,1) 
-#         # loglike_given_class - N X N, loglike_without_class - N X1
-#         loglike_ratio = loglike_given_class - loglike_without_class  # N X N
+            loglike_given_class[:,i] = -0.5 * (logdet_given + M_LOG_2PI * dim + \
+                                   np.matmul(sqdiff_given, variance_given))
+        sqdiff_without = sqdiff**2
+        loglike_without_class = -0.5 * (logdet_without + M_LOG_2PI * dim + \
+                                     np.matmul(sqdiff_without, variance_without))
+        loglike_without_class = loglike_without_class.reshape(-1,1) 
+        # loglike_given_class - N X N, loglike_without_class - N X1
+        loglike_ratio = loglike_given_class - loglike_without_class  # N X N
         
-#         return loglike_ratio
+        return loglike_ratio
 # ******************
 
 
@@ -230,6 +230,47 @@ def refineSimilarityMatrix(plda, similarityMatrix):
   affMatA_diffusion = np.dot(affMatA_symmetrization, affMatA_symmetrization.T)
   return matrixGrayScale(affMatA_diffusion, scale =1)
 
+def ddt(Xk_list):
+  # N - Dimension of the embedding; L - Number of examples; K - Number of classes
+  rndLabels = []; rndTrSet = []
+  for k, x in enumerate(Xk_list):
+    rndLabels.append([k for _ in range(x.shape[1])]); rndTrSet.append(x)
+  train_embeddings_sorted, train_labels_sorted = np.hstack(rndTrSet).T, np.hstack(rndLabels)
+  # (N, L), each column is an embedding
+  X, labels_sorted = train_embeddings_sorted.T, train_labels_sorted  
+  N, L = X.shape; K = len(set(labels_sorted))
+  assert L == len(labels_sorted), 'number of examples and number of labels are not the same'
+
+  meanSet = np.mean(X, axis=1); X__c = (X.T - meanSet).T # (N, L)
+  Xtemp = X.T.copy(); X_k_c = []; x_k_mean = []; c_mean = np.zeros(N)
+  for i, k in enumerate(set(labels_sorted)):
+    x_k = Xtemp[np.where(labels_sorted == k)] # (Number of examples per class, dimension of embedding)
+    x_k_mean.append(np.mean(x_k, axis=0)) # mean is (dimension of embedding,)
+    c_mean += (len(x_k)/L)*x_k_mean[-1] # sum(P_k*c_k)
+    X_k_c.append(x_k - x_k_mean[-1]) # examples per class centered with its own mean
+  C = np.vstack(x_k_mean).T # (N, K)
+  C_c = (C.T - c_mean).T # (N, K)
+  X_c_c = np.vstack(X_k_c).T # (N, L) embeddings centered with its class' own mean
+  X_k_mean = np.vstack(x_k_mean).T # (N, K) centers of all the classes
+  # Covariance Matrices
+  Rw = sum([(len(xkc)/L)*(1/len(xkc) * xkc.T @ xkc) for i, xkc in enumerate(X_k_c)])
+  Rb = (np.unique(labels_sorted, return_counts = True)[1]*C_c @ C_c.T)/L 
+  ### Diagonalization
+  lambda_Rw, E_Rw = np.linalg.eigh(Rw)
+  # Sort the eigenvalues
+  idx_lambda_Rw = lambda_Rw.argsort()[::-1]; lambda_Rw = lambda_Rw[idx_lambda_Rw]; E_Rw = E_Rw[:,idx_lambda_Rw]
+  Sig_w_inv = np.diag(1/np.sqrt(lambda_Rw)) # (N, N)
+  W_prime = E_Rw @ Sig_w_inv
+  lambda_Rb, E_Rb = np.linalg.eigh(W_prime.T @ Rb @ W_prime)
+  # Sort the eigenvalues
+  idx_lambda_Rb = lambda_Rb.argsort()[::-1]; lambda_Rb = lambda_Rb[idx_lambda_Rb]; E_Rb = E_Rb[:,idx_lambda_Rb]
+  W = W_prime @ E_Rb; Lw = W.T @ Rw @ W; Lb = W.T @ Rb @ W
+  # Psi = lambda_Rb/lambda_Rw
+  Psi = Lb/Lw
+  # Psi = W.T @ Rb @ W
+  A = np.linalg.pinv(W.T); Ainv = W.T
+  phi_w = A @ A.T; phi_b = A @ np.diag(Psi) @ A.T; sigmas_b = np.sqrt(lambda_Rb) 
+  return W, meanSet, sigmas_b, Rw, Rb, lambda_Rw, lambda_Rb
 
 if __name__ == "__main__":
     L = 100# examples
