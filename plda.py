@@ -33,6 +33,7 @@ class PLDA:
   def clusterEmbeddings(self, X, algorithm = SpectralClustering, nClusters = 2, linkage = 'average', affinity = 'precomputed'): return clusterEmbeddings(self, X, algorithm, nClusters, linkage, affinity)
   def upsampleCluster (self, clusteredLabels, section_length = 4, section_overlap = 0.75): return upsampleCluster (self, clusteredLabels, section_length, section_overlap)
   def cosineSimilarityMatrix(self, X, factor = lambda C:C): return cosineSimilarityMatrix(self, X, factor)
+  def normalize(self, X, function = lambda x : 1/(1+np.exp(-5*x))): return normalize(self, X, function)
   def labelFormat(self, segmentDictCluster): return labelFormat(self, segmentDictCluster)
   def segmentAudioLabels(self, audioN_labels, y, fs=8000): return segmentAudioLabels(self, audioN_labels, y, fs)
   def refineSimilarityMatrix(self, similarityMatrix): return refineSimilarityMatrix(self, similarityMatrix)
