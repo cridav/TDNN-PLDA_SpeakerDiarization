@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from time import time
 from easydict import EasyDict as edict
 from sklearn.cluster import SpectralClustering, AgglomerativeClustering, KMeans
+from scipy.ndimage import gaussian_filter
 
 class PLDA:
   def __init__(self,Xk_list, dim = -1, crop = False):
