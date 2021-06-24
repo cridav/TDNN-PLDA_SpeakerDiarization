@@ -7,7 +7,6 @@ import pickle
 # import torch
 import io
 import warnings
-from IPython.display import Audio
 import librosa
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
@@ -26,7 +25,8 @@ from pyannote.metrics.detection import DetectionAccuracy
 from pyannote.core import notebook
 
 import pandas as pd
-from IPython.display import display
+from IPython.display import display, Audio
+
 
 def matrixGrayScale(M, scale=255):
   """
