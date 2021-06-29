@@ -159,8 +159,8 @@ def clusterEmbeddings(plda, X, algorithm = SpectralClustering, nClusters = 2, li
     clustering = algorithm(n_clusters = nClusters,
                           linkage = 'average',
                           affinity = 'precomputed').fit(1-X) # Distance matrix
-  elif algorithm == KMedoids:
-    clustering = algorithm(n_clusters = nClusters,
+  elif algorithm == 'KMedoids':
+    clustering = KMedoids(n_clusters = nClusters,
                             metric = 'precomputed',
                             method = 'pam', 
                             init = 'k-medoids++').fit(1-X) # Distance matrix
