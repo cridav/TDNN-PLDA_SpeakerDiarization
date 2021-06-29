@@ -1,3 +1,7 @@
+import os, os.path
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__),'..')))
+
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 import numpy.linalg as la
@@ -143,7 +147,7 @@ def decorrelate(plda, X):
   # print(temp.shape)
   return plda.W.T @ temp
 def clusterEmbeddings(plda, X, algorithm = SpectralClustering, nClusters = 2, linkage = 'average', affinity = 'precomputed'):
-  """AgglomerativeClustering, KMeans or SpectralClustering
+  """AgglomerativeClustering, KMedoids, KMeans or SpectralClustering
   X: Similarity matrix (main diagonal contains the highest scores)"""
   if algorithm == SpectralClustering:
     clustering = algorithm(n_clusters = nClusters,
@@ -291,4 +295,9 @@ if __name__ == "__main__":
     L = 100# examples
     N = 512 # dimension
     X = np.random.rand(L, N)
-    plda = PLDA(X)
+    labels = np.random.randint(10, size = L)
+
+    newXSet = []
+    for k in set(labels):
+      newXSet.append(X[np.where(labels == k)].T) # class embeddings represented as a list of list of embeddings
+    plda = PLDA(newXSet)
