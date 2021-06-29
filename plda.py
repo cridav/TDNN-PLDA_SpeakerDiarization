@@ -143,7 +143,8 @@ def decorrelate(plda, X):
   # print(temp.shape)
   return plda.W.T @ temp
 def clusterEmbeddings(plda, X, algorithm = SpectralClustering, nClusters = 2, linkage = 'average', affinity = 'precomputed'):
-  """AgglomerativeClustering, KMeans or SpectralClustering"""
+  """AgglomerativeClustering, KMeans or SpectralClustering
+  X: Similarity matrix (main diagonal contains the highest scores)"""
   if algorithm == SpectralClustering:
     clustering = algorithm(n_clusters = nClusters,
                           random_state=0,
