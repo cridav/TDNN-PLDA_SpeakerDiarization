@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from time import time
 from easydict import EasyDict as edict
 from sklearn.cluster import SpectralClustering, AgglomerativeClustering, KMeans
+from sklearn_extra.cluster import KMedoids
 from scipy.ndimage import gaussian_filter
 from plotUtilities import *
 
@@ -147,11 +148,16 @@ def clusterEmbeddings(plda, X, algorithm = SpectralClustering, nClusters = 2, li
     clustering = algorithm(n_clusters = nClusters,
                           random_state=0,
                           assign_labels="discretize",
-                          affinity = 'precomputed').fit(X)
+                          affinity = 'precomputed').fit(X) # Similarity matrix
   elif algorithm == AgglomerativeClustering:
     clustering = algorithm(n_clusters = nClusters,
                           linkage = 'average',
-                          affinity = 'precomputed').fit(X)
+                          affinity = 'precomputed').fit(1-X) # Distance matrix
+  elif algorithm == KMedoids:
+    clustering = algorithm(n_clusters = nClusters,
+                            metric = 'precomputed',
+                            method = 'pam', 
+                            init = 'k-medoids++').fit(1-X) # Distance matrix
   elif algorithm == KMeans:
     clustering = algorithm(n_clusters=nSpeakers, random_state=0).fit(X)
   else:
