@@ -65,7 +65,7 @@ def plotAudioSignals(segmentDict, y, sr, load_audio = '', size = (10,6)):
 def plotClusteredMasks(segmentDictCluster, load_audio = ''):
   """Plot the masks found after clustering"""
   plotColor = "bgrcmykw"
-  figure, ax = plt.subplots(len(segmentDict.keys())+1)
+  figure, ax = plt.subplots(len(segmentDictCluster.keys())+1)
   figure.set_size_inches(10,6)
   figure.tight_layout(pad=4.0)
 
