@@ -165,7 +165,7 @@ def clusterEmbeddings(plda, X, algorithm = SpectralClustering, nClusters = 2, li
                             method = 'pam', 
                             init = 'k-medoids++').fit(1-X) # Distance matrix
   elif algorithm == KMeans:
-    clustering = algorithm(n_clusters=nSpeakers, random_state=0).fit(X)
+    clustering = algorithm(n_clusters=nClusters, random_state=0).fit(X)
   else:
     raise Exception('Clustering algorithm is not defined')
   return clustering.labels_
